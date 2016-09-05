@@ -60,11 +60,8 @@ generalB f gena genb s = (f a b, s3)
 generalPair2 :: Gen a -> Gen b -> Gen (a,b)
 generalPair2 = generalB (,)
 
-generalB2 :: (a -> b -> c) -> Gen b -> Gen a -> Gen c
-generalB2 f genb gena = generalB f gena genb
-  
 repRandom :: [Gen a] -> Gen [a]
-repRandom genas = foldl (generalB2 (:)) (mkGen []) genas
+repRandom gens = foldl (flip (generalB (:))) (mkGen []) gens
 
 genTwo :: Gen a -> (a -> Gen b) -> Gen b
 genTwo gena f s = f a s2
