@@ -58,3 +58,56 @@ queryGreek gd s =
               case headMay xs of
                 Nothing -> Nothing
                 Just h -> divMay (fromIntegral m) (fromIntegral h)
+
+chain :: (a -> Maybe b) -> Maybe a -> Maybe b
+chain _ Nothing = Nothing
+chain f (Just a) = f a 
+
+link :: Maybe a -> (a -> Maybe b) -> Maybe b
+link Nothing _ = Nothing
+link (Just a) f = f a 
+
+queryGreek2 :: GreekData -> String -> Maybe Double
+queryGreek2 gd =
+  \s -> link (lookupMay s gd)
+  (\xs -> link (tailMay xs)
+    (\t -> link (maximumMay t)
+      (\m -> link (headMay xs)
+        (\h -> divMay (fromIntegral m) (fromIntegral h)))))
+                           
+
+addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries ss n1 n2 =
+  link (lookupMay n1 ss)
+  (\s1 -> link (lookupMay n2 ss)
+    (\s2 -> mkMaybe (s1 + s2)))
+
+yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+yLink f (Just x) (Just y) = mkMaybe (f x y)
+yLink f _ _ = Nothing
+
+addSalaries2 :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries2 ss n1 n2 = yLink (+) (lookupMay n1 ss) (lookupMay n2 ss)
+
+mkMaybe :: a -> Maybe a
+mkMaybe a = Just a
+
+tailProd :: Num a => [a] -> Maybe a
+tailProd xs = transMaybe product (tailMay xs)
+
+tailSum :: Num a => [a] -> Maybe a
+tailSum xs = transMaybe sum (tailMay xs)
+
+transMaybe :: (a -> b) -> Maybe a -> Maybe b
+transMaybe f Nothing = Nothing
+transMaybe f (Just x) = mkMaybe (f x)
+  
+tailMax :: Ord a => [a] -> Maybe a
+tailMax xs = combine (transMaybe maximumMay (tailMay xs))
+
+tailMin :: Ord a => [a] -> Maybe a
+tailMin xs = combine (transMaybe minimumMay (tailMay xs))
+
+combine :: Maybe (Maybe a) -> Maybe a
+combine Nothing = Nothing
+combine (Just x) = x
