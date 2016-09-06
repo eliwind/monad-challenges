@@ -95,19 +95,19 @@ mkMaybe :: a -> Maybe a
 mkMaybe a = Just a
 
 tailProd :: Num a => [a] -> Maybe a
-tailProd xs = transMaybe product (tailMay xs)
+tailProd = (transMaybe product) . tailMay
 
 tailSum :: Num a => [a] -> Maybe a
-tailSum xs = transMaybe sum (tailMay xs)
+tailSum = (transMaybe sum) . tailMay
 
 transMaybe :: (a -> b) -> Maybe a -> Maybe b
 transMaybe f mx = link mx (mkMaybe . f)
   
 tailMax :: Ord a => [a] -> Maybe a
-tailMax xs = combine (transMaybe maximumMay (tailMay xs))
+tailMax = combine . (transMaybe maximumMay) . tailMay
 
 tailMin :: Ord a => [a] -> Maybe a
-tailMin xs = combine (transMaybe minimumMay (tailMay xs))
+tailMin = combine . (transMaybe minimumMay) . tailMay
 
 combine :: Maybe (Maybe a) -> Maybe a
 combine Nothing = Nothing
