@@ -1,7 +1,7 @@
 {-# LANGUAGE MonadComprehensions #-}
 {-# LANGUAGE RebindableSyntax  #-}
 
-module Set1 where
+module Set2 where
 
 import MCPrelude
 
