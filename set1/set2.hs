@@ -31,18 +31,11 @@ divMay x y = Just (x / y)
   
 maximumMay :: Ord a => [a] -> Maybe a
 maximumMay [] = Nothing
-maximumMay (x:xs) = Just (maximum x xs)
-  where
-    maximum m [] = m
-    maximum m (x:xs) = maximum (max m x) xs
+maximumMay (x:xs) = Just (foldl max x xs)
       
 minimumMay :: Ord a => [a] -> Maybe a
 minimumMay [] = Nothing
-minimumMay (x:xs) = Just (minimum x xs)
-  where
-    minimum m [] = m
-    minimum m (x:xs) = minimum (min m x) xs
-
+minimumMay (x:xs) = Just (foldl min x xs)
 
 queryGreek :: GreekData -> String -> Maybe Double
 queryGreek gd s =
@@ -68,25 +61,25 @@ link Nothing _ = Nothing
 link (Just a) f = f a 
 
 queryGreek2 :: GreekData -> String -> Maybe Double
-queryGreek2 gd =
-  \s -> link (lookupMay s gd)
-  (\xs -> link (tailMay xs)
-    (\t -> link (maximumMay t)
-      (\m -> link (headMay xs)
-        (\h -> divMay (fromIntegral m) (fromIntegral h)))))
+queryGreek2 gd s =
+  (lookupMay s gd) `link` \xs ->
+  (tailMay xs) `link` \t ->
+  (maximumMay t) `link` \m ->
+  (headMay xs) `link` \h ->
+  divMay (fromIntegral m) (fromIntegral h)
                            
 
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries ss n1 n2 =
-  link (lookupMay n1 ss)
-  (\s1 -> link (lookupMay n2 ss)
-    (\s2 -> mkMaybe (s1 + s2)))
+  (lookupMay n1 ss) `link` \s1 ->
+  (lookupMay n2 ss) `link` \s2 ->
+  mkMaybe (s1 + s2)
 
 yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
 yLink f ma mb =
-  link ma
-    (\x -> link mb
-      (\y -> mkMaybe (f x y)))
+  ma `link` \x ->
+  mb `link` \y ->
+  mkMaybe (f x y)
 
 addSalaries2 :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries2 ss n1 n2 = yLink (+) (lookupMay n1 ss) (lookupMay n2 ss)

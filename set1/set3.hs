@@ -18,11 +18,11 @@ allCards = allCombs Card
 
 allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
 allCombs f as bs =
-  combStep (map f as) bs
+  (map f as) `combStep` bs
 
 allCombs3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
 allCombs3 f as bs cs =
-  combStep (combStep (map f as) bs) cs
+  (map f as) `combStep` bs `combStep` cs
   
 combStep :: [a -> b] -> [a] -> [b]
 combStep [] _ = []
