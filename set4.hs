@@ -78,19 +78,14 @@ instance Monad Gen where
 
 sequence :: Monad m => [m a] -> m [a]
 sequence [] = return []
-sequence (m:ms) = liftM2 (:) m (sequence ms)
+sequence (m:ms) = return (:) `ap` m `ap` (sequence ms)
 
 
 liftM :: Monad m => (a -> b) -> m a -> m b
-liftM f m =
-  m >>= \a ->
-  return (f a)
+liftM f m = return f `ap` m
 
 liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
-liftM2 f m m2 =
-  m >>= \a ->
-  m2 >>= \b ->
-  return (f a b)
+liftM2 f m m2 = return f `ap` m `ap` m2
 
 (=<<) :: Monad m => (a -> m b) -> m a -> m b
 (=<<) = flip bind
@@ -134,7 +129,7 @@ randTen :: Gen Integer -- the output of rand * 10
 randTen = liftM (* 10) randInt
 
 randPair :: Gen (Char, Integer)
-randPair = liftM2 (,) randLetter randInt
+randPair = return (,) `ap` randLetter `ap` randInt
 
 
 --- Set 2 redo
@@ -177,7 +172,7 @@ queryGreek gd s =
   divMay (fromIntegral m) (fromIntegral (fst ht))
 
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
-addSalaries ss n1 n2 = liftM2 (+) (lookupMay n1 ss) (lookupMay n2 ss)
+addSalaries ss n1 n2 = return (+) `ap` (lookupMay n1 ss) `ap` (lookupMay n2 ss)
 
 tailProd :: Num a => [a] -> Maybe a
 tailProd = (liftM product) . tailMay
