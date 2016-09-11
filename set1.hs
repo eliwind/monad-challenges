@@ -70,3 +70,29 @@ genTwo gena f s = f a s2
 mkGen :: a -> Gen a
 mkGen a s = (a, s)
 
+
+----
+-- Added in Set 4
+
+generalA2 :: (a -> b) -> Gen a -> Gen b
+generalA2 f ga =
+  ga `genTwo` \a ->
+  mkGen (f a)
+
+generalB2 :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
+generalB2 f gena genb =
+  gena `genTwo` \a ->
+  genb `genTwo` \b ->
+  mkGen (f a b)
+
+repRandom2 :: [Gen a] -> Gen [a]
+repRandom2 [] = mkGen []
+repRandom2 (g:gs) = generalB2 (:) g (repRandom2 gs)
+
+repRandom3 :: [Gen a] -> Gen [a]
+repRandom3 [] = mkGen []
+repRandom3 (g:gs) =
+  g `genTwo` \a ->
+  repRandom3 gs `genTwo` \as ->
+  mkGen (a:as)
+
