@@ -142,10 +142,7 @@ tailMay [] = Nothing
 tailMay (x:xs) = Just xs
 
 splitMay :: [a] -> Maybe (a, [a])
-splitMay l =
-  (headMay l) >>= \h ->
-  (tailMay l) >>= \t ->
-  return (h, t)
+splitMay l = return (,) `ap` (headMay l) `ap` (tailMay l)
 
 lookupMay :: Eq a => a -> [(a, b)] -> Maybe b
 lookupMay x [] = Nothing
