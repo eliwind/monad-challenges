@@ -175,16 +175,24 @@ addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries ss n1 n2 = return (+) `ap` (lookupMay n1 ss) `ap` (lookupMay n2 ss)
 
 tailProd :: Num a => [a] -> Maybe a
-tailProd = (liftM product) . tailMay
+tailProd xs =
+  tailMay xs >>= \t ->
+  return (product t)
 
 tailSum :: Num a => [a] -> Maybe a
-tailSum = (liftM sum) . tailMay
+tailSum xs =
+  tailMay xs >>= \t ->
+  return (sum t)
 
 tailMax :: Ord a => [a] -> Maybe a
-tailMax = join . (liftM maximumMay) . tailMay
+tailMax xs =
+  tailMay xs >>= \t ->
+  maximumMay t
 
 tailMin :: Ord a => [a] -> Maybe a
-tailMin = join . (liftM minimumMay) . tailMay
+tailMin xs =
+  tailMay xs >>= \t ->
+  minimumMay t
 
 --- Set 3 redo
 
