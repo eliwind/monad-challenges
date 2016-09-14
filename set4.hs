@@ -159,11 +159,11 @@ divMay x y = Just (x / y)
   
 maximumMay :: Ord a => [a] -> Maybe a
 maximumMay [] = Nothing
-maximumMay (x:xs) = Just (foldl max x xs)
+maximumMay (x:xs) = Just (foldr max x xs)
       
 minimumMay :: Ord a => [a] -> Maybe a
 minimumMay [] = Nothing
-minimumMay (x:xs) = Just (foldl min x xs)
+minimumMay (x:xs) = Just (foldr min x xs)
 
 queryGreek :: GreekData -> String -> Maybe Double
 queryGreek gd s =
