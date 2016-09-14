@@ -78,7 +78,7 @@ instance Monad Gen where
 
 sequence :: Monad m => [m a] -> m [a]
 sequence [] = return []
-sequence (m:ms) = return (:) `ap` m `ap` (sequence ms)
+sequence (m:ms) = return (:) `ap` m `ap` sequence ms
 
 
 liftM :: Monad m => (a -> b) -> m a -> m b
@@ -146,7 +146,7 @@ tailMay [] = Nothing
 tailMay (_:xs) = Just xs
 
 splitMay :: [a] -> Maybe (a, [a])
-splitMay l = return (,) `ap` (headMay l) `ap` (tailMay l)
+splitMay l = return (,) `ap` headMay l `ap` tailMay l
 
 lookupMay :: Eq a => a -> [(a, b)] -> Maybe b
 lookupMay _ [] = Nothing
@@ -173,7 +173,7 @@ queryGreek gd s =
   divMay (fromIntegral m) (fromIntegral (fst ht))
 
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
-addSalaries ss n1 n2 = return (+) `ap` (lookupMay n1 ss) `ap` (lookupMay n2 ss)
+addSalaries ss n1 n2 = return (+) `ap` lookupMay n1 ss `ap` lookupMay n2 ss
 
 tailProd :: Num a => [a] -> Maybe a
 tailProd = tailMay >=> (return . product)
