@@ -99,6 +99,10 @@ ap mf ma =
   ma >>= \a ->
   return (f a)
 
+(>=>) :: Monad m => (a -> m b) -> (b -> m c) -> (a -> m c)
+(>=>) f g a =
+  f a >>= \b -> g b
+
 --- Set 1 Redo
 
 randInt :: Gen Integer
@@ -109,13 +113,13 @@ randLetter = liftM toLetter randInt
 
 randString3 :: String
 randString3 = str
-  where (str, s') = runGen strGen s
+  where (str, _) = runGen strGen s
         strGen = sequence (replicate 3 randLetter)
         s = mkSeed(1)
 
 fiveRands :: [Integer]
 fiveRands = xs
-  where (xs, s') = runGen xsGen s
+  where (xs, _) = runGen xsGen s
         xsGen = sequence (replicate 5 randInt)
         s = mkSeed(1)
 
@@ -135,22 +139,22 @@ randPair = return (,) `ap` randLetter `ap` randInt
 --- Set 2 redo
 headMay :: [a] -> Maybe a
 headMay [] = Nothing
-headMay (x:xs) = Just x
+headMay (x:_) = Just x
 
 tailMay :: [a] -> Maybe [a]
 tailMay [] = Nothing
-tailMay (x:xs) = Just xs
+tailMay (_:xs) = Just xs
 
 splitMay :: [a] -> Maybe (a, [a])
 splitMay l = return (,) `ap` (headMay l) `ap` (tailMay l)
 
 lookupMay :: Eq a => a -> [(a, b)] -> Maybe b
-lookupMay x [] = Nothing
+lookupMay _ [] = Nothing
 lookupMay x ((x2,y):_) | x == x2 = Just y
 lookupMay x (_:tail) = lookupMay x tail
 
 divMay :: (Eq a, Fractional a) => a -> a -> Maybe a
-divMay x 0 = Nothing
+divMay _ 0 = Nothing
 divMay x y = Just (x / y)
   
 maximumMay :: Ord a => [a] -> Maybe a
@@ -172,24 +176,16 @@ addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries ss n1 n2 = return (+) `ap` (lookupMay n1 ss) `ap` (lookupMay n2 ss)
 
 tailProd :: Num a => [a] -> Maybe a
-tailProd xs =
-  tailMay xs >>= \t ->
-  return (product t)
+tailProd xs = return product `ap` (tailMay xs)
 
 tailSum :: Num a => [a] -> Maybe a
-tailSum xs =
-  tailMay xs >>= \t ->
-  return (sum t)
+tailSum xs = return sum `ap` (tailMay xs)
 
 tailMax :: Ord a => [a] -> Maybe a
-tailMax xs =
-  tailMay xs >>= \t ->
-  maximumMay t
+tailMax = tailMay >=> maximumMay
 
 tailMin :: Ord a => [a] -> Maybe a
-tailMin xs =
-  tailMay xs >>= \t ->
-  minimumMay t
+tailMin = tailMay >=> minimumMay
 
 --- Set 3 redo
 
